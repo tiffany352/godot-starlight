@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://cwy238cxfbs2q"]
+
+[ext_resource type="PackedScene" uid="uid://b0nt4n13a6448" path="res://addons/starlight/Stars.tscn" id="1_bquit"]
+
+[sub_resource type="Environment" id="Environment_ah14t"]
+background_energy_multiplier = 0.0
+ambient_light_energy = 0.0
+
+[node name="demo" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ah14t")
+
+[node name="Stars" parent="." instance=ExtResource("1_bquit")]
+size = 10000.0
