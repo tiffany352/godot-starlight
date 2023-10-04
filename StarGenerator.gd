@@ -4,6 +4,7 @@ extends "res://addons/starlight/StarManager.gd"
 @export var size: float = 5000: set = _set_extents
 @export var star_count: int = 10000: set = _set_star_count
 @export var rng_seed: int = 1234: set = _set_rng_seed
+@export var generate_at_origin: bool = false: set = _set_generate_at_origin
 
 
 var _regenerate = true
@@ -21,6 +22,11 @@ func _set_star_count(value):
 
 func _set_rng_seed(value):
 	rng_seed = value
+	_regenerate = true
+
+
+func _set_generate_at_origin(value):
+	generate_at_origin = value
 	_regenerate = true
 
 
@@ -60,6 +66,8 @@ class StarClass:
 
 	func get_star(position: Vector3, value: float):
 		var p = self.sample(value)
+		# B and O-class stars are obscenely bright, so spawn them further away than other stars.
+		position *= max(1.0, p.luminosity / 400)
 		return Star.new(position, p.luminosity, p.temp)
 
 
@@ -67,50 +75,50 @@ var class_O = StarClass.new({
 	weight = 1,
 	stellar_class = "O",
 	temp_range = RangeF.new(30_000, 60_000),
-	luminosity_range = RangeF.new(30_000_00, 60_000_00),
-	mass_range = RangeF.new(16_00, 32_00),
+	luminosity_range = RangeF.new(30_000, 60_000),
+	mass_range = RangeF.new(16, 32),
 })
 var class_B = StarClass.new({
 	weight = 13,
 	stellar_class = "B",
 	temp_range = RangeF.new(10_000, 30_000),
-	luminosity_range = RangeF.new(25_00, 30_000_00),
-	mass_range = RangeF.new(2_10, 16_00),
+	luminosity_range = RangeF.new(25, 30_000),
+	mass_range = RangeF.new(2.1, 16),
 })
 var class_A = StarClass.new({
 	weight = 60,
 	stellar_class = "A",
 	temp_range = RangeF.new(7500, 10_000),
-	luminosity_range = RangeF.new(5_00, 25_00),
-	mass_range = RangeF.new(1_40, 2_10),
+	luminosity_range = RangeF.new(5, 25),
+	mass_range = RangeF.new(1.4, 2.1),
 })
 var class_F = StarClass.new({
 	weight = 3_00,
 	stellar_class = "F",
 	temp_range = RangeF.new(6000, 7500),
-	luminosity_range = RangeF.new(1_50, 5_00),
-	mass_range = RangeF.new(1_04, 1_40),
+	luminosity_range = RangeF.new(1.5, 5),
+	mass_range = RangeF.new(1.04, 1.4),
 })
 var class_G = StarClass.new({
 	weight = 7_60,
 	stellar_class = "G",
 	temp_range = RangeF.new(5200, 6000),
-	luminosity_range = RangeF.new(60, 1_50),
-	mass_range = RangeF.new(0_80, 1_04),
+	luminosity_range = RangeF.new(.6, 1.50),
+	mass_range = RangeF.new(0.8, 1.04),
 })
 var class_K = StarClass.new({
 	weight = 12_10,
 	stellar_class = "K",
 	temp_range = RangeF.new(3700, 5200),
-	luminosity_range = RangeF.new(8, 60),
-	mass_range = RangeF.new(0_45, 0_80),
+	luminosity_range = RangeF.new(0.08, 0.6),
+	mass_range = RangeF.new(0.45, 0.8),
 })
 var class_M = StarClass.new({
 	weight = 76_45,
 	stellar_class = "M",
 	temp_range = RangeF.new(2400, 3700),
-	luminosity_range = RangeF.new(0, 8),
-	mass_range = RangeF.new(0_08, 0_45),
+	luminosity_range = RangeF.new(0.1, 0.08),
+	mass_range = RangeF.new(0.08, 0.45),
 })
 
 
@@ -151,23 +159,6 @@ func random_category(rng: RandomNumberGenerator):
 			return category
 
 
-func random_star(rng: RandomNumberGenerator):
-	var sum = 0
-	for category in star_table:
-		sum += category.weight;
-
-	var weight = rng.randi_range(1, sum - 1)
-
-	sum = 0
-	for category in star_table:
-		var prev = sum
-		sum += category.weight;
-		if weight <= sum:
-			var value = (weight - prev) / category.weight
-			var pos = sample_sphere(rng, size)
-			return category.get_star(pos, value)
-
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	if not _regenerate:
@@ -178,11 +169,12 @@ func _process(delta):
 	var rng = RandomNumberGenerator.new()
 	rng.seed = rng_seed
 
-	var stars = []
+	var stars: Array[Star] = []
 
-	stars.push_back(class_G.get_star(Vector3.ZERO, 0.5))
+	if generate_at_origin:
+		stars.push_back(class_G.get_star(Vector3.ZERO, 0.5))
 
-	for i in range(1, star_count):
+	for i in range(0, star_count):
 		var category = random_category(rng)
 		if not category:
 			continue
@@ -190,4 +182,6 @@ func _process(delta):
 		stars.push_back(category.get_star(sample_sphere(rng, size), rng.randf()))
 
 	set_star_list(stars)
+
+	super._process(delta)
 

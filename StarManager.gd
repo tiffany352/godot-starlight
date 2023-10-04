@@ -1,8 +1,9 @@
 @tool
 extends MultiMeshInstance3D
 
+
 class Star:
-	# Position of the star, in light years.
+	# Position of the star.
 	var position: Vector3
 	# Luminosity of the star, relative to the luminosity of the Sun. (L☉)
 	var luminosity: float
@@ -117,7 +118,7 @@ func _process(_delta):
 
 	for i in range(_star_list.size()):
 		var star = _star_list[i]
-		var transform = Transform3D().translated(star.position * max(1.0, star.luminosity / 40_000))
+		var transform = Transform3D().translated(star.position)
 		multimesh.set_instance_transform(i, transform)
 		multimesh.set_instance_color(i, blackbody_to_rgb(star.temperature))
 		multimesh.set_instance_custom_data(i, Color(star.luminosity, 0, 0))
