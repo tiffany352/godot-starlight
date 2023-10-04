@@ -1,12 +1,13 @@
 # Starlight for Godot 4.1
 
 [![GitHub link](https://img.shields.io/github/license/tiffany352/godot-starlight)](https://github.com/tiffany352/godot-starlight)
+[![Godot asset library](https://img.shields.io/badge/godot-assets-blue)](https://godotengine.org/asset-library/asset/9207)
 
 ![Screenshot](docs/screenshot.jpg)
 (Planet rendered using [Atmosphere Shader v0.4](https://godotengine.org/asset-library/asset/2002))
 
 Starlight is a Godot addon that renders 100,000 stars in realtime, with
-minimal performance cost. It's an alternative to using a skybox, and
+low performance cost. It's an alternative to using a skybox, and
 also may be relevant to anyone making a space game.
 
 # Features
@@ -20,6 +21,7 @@ also may be relevant to anyone making a space game.
   (PSF)][1], rather than a texture that grows or shrinks with
   distance/brightness.
 - Based on [MultiMeshInstance3D][2] for performance.
+- Designed for Forward+ renderer, works as expected in the Mobile renderer, may have issues in the Compatibility renderer.
 
 [1]: https://en.wikipedia.org/wiki/Point_spread_function
 [2]: https://docs.godotengine.org/en/stable/classes/class_multimeshinstance3d.html
