@@ -4,7 +4,7 @@ render_mode blend_add,depth_draw_opaque,cull_disabled,diffuse_burley,specular_sc
 
 uniform sampler2D texture_emission : hint_default_black;
 uniform float emission_energy;
-uniform float billboard_size : hint_range(0, 1024);
+uniform float billboard_size : hint_range(0, 2048);
 uniform float min_size : hint_range(0, 1024);
 uniform float max_luminosity;
 uniform float meters_per_lightyear = 100.0;
@@ -53,8 +53,8 @@ vec3 aces_transform(vec3 x) {
 void fragment() {
 	vec3 emission_tex = texture(texture_emission, UV).rgb;
 	ALBEDO = clamp(STAR_COLOR * emission_tex, 0.0, 1.0);
-	if (ALBEDO.x < 0.001 || ALBEDO.y < 0.001 || ALBEDO.z < 0.001)
+	//ALBEDO += vec3(0.1);
+	if (ALBEDO.x < 0.001 && ALBEDO.y < 0.001 && ALBEDO.z < 0.001)
 		discard;
-	//ALBEDO = vec3(0, 0, 0.1);
 	DEPTH = 1.0;
 }
