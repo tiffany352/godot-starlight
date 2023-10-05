@@ -4,11 +4,12 @@ render_mode blend_add,depth_draw_opaque,cull_disabled,diffuse_burley,specular_sc
 
 uniform sampler2D texture_emission : hint_default_black;
 uniform float emission_energy;
-uniform float billboard_size : hint_range(0, 2048);
-uniform float min_size : hint_range(0, 1024);
+uniform float billboard_size_deg : hint_range(0, 90) = 90;
+uniform float min_size_ratio : hint_range(0, 1.0) = 1.0;
 uniform float max_luminosity;
 uniform float meters_per_lightyear = 100.0;
 uniform float distance_limit = 1.0;
+uniform float camera_vertical_fov = 70;
 
 
 varying vec3 STAR_COLOR;
@@ -31,11 +32,12 @@ void vertex() {
 	float luminosity = INSTANCE_CUSTOM.r * emission_energy * emission;
 	STAR_COLOR = COLOR.rgb * luminosity;
 
-	float size = mix(min_size, billboard_size, clamp(luminosity / max_luminosity, 0.0, 1.0));
-	float crop = size / billboard_size;
+	float size = mix(min_size_ratio * billboard_size_deg, billboard_size_deg, clamp(luminosity / max_luminosity, 0.0, 1.0));
+	float crop = size / billboard_size_deg;
 	UV = (UV - vec2(0.5)) * crop + vec2(0.5);
 	vec4 projected = PROJECTION_MATRIX * vec4(modelview_pos, 1.0);
-	POSITION = projected + vec4(VERTEX.xy * projected.w * size / VIEWPORT_SIZE, 0.0, 0.0);
+	vec2 one_degree = vec2(1.0, VIEWPORT_SIZE.x / VIEWPORT_SIZE.y) / camera_vertical_fov;
+	POSITION = projected + vec4(VERTEX.xy * projected.w * size * one_degree, 0.0, 0.0);
 	POSITION.z = 0.0;
 }
 
