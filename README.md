@@ -10,6 +10,8 @@ Starlight is a Godot addon that renders 100,000 stars in realtime, with
 low performance cost. It's an alternative to using a skybox, and
 also may be relevant to anyone making a space game.
 
+Check out the demo in your web browser: https://tiffnix.com/starlight-demo/
+
 # Features
 
 - Stars are rendered positionally in 3D, allowing you to fly around and
@@ -21,7 +23,7 @@ also may be relevant to anyone making a space game.
   (PSF)][1], rather than a texture that grows or shrinks with
   distance/brightness.
 - Based on [MultiMeshInstance3D][2] for performance.
-- Designed for Forward+ renderer, works as expected in the Mobile renderer, may have issues in the Compatibility renderer.
+- Works with Forward+, Mobile, and Compatibility renderers.
 
 [1]: https://en.wikipedia.org/wiki/Point_spread_function
 [2]: https://docs.godotengine.org/en/stable/classes/class_multimeshinstance3d.html
@@ -55,12 +57,17 @@ Inside here you will find more properties to configure.
 - `emission_energy` - Multiplier for how bright stars should be.
   Generally this is some extremely large number like `50000000000` -
   you'll need to add or remove zeros until it looks right.
-- `billboard_size` - This controls how much of the screen the PSF
-  texture takes up, in pixels. For the default JWST PSF I recommend a
-  value of 2048.
-- `min_size` - There is a performance optimization where the PSF texture
+- `camera_vertical_fov` - The vertical camera FOV. By default in Godot
+  this is 70, but if you change it you may need to adjust it here. For
+  example, if you're zooming in the camera, you'll need to adjust this.
+- `billboard_size_deg` - This controls how much of the screen the PSF
+  texture takes up, in degrees. For the default JWST PSF I recommend a
+  value of around 70.
+- `min_size_ratio` - There is a performance optimization where the PSF texture
   is cropped for stars that are dim. This will be 99.999% of stars.
-  Generally set this to some low value like 16.
+  Generally set this to some low value like 0.005.
+- `debug_show_rects` - This can be useful while tweaking the values of
+  `billboard_size_deg` and `min_size_ratio`.
 - `max_luminosity` - This is the point at which the cropping stops and
   the full PSF texture is used. If your PSF looks cut off, you may need
   to lower this.
