@@ -1,0 +1,17 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://dc40ioj1swhy"]
+
+[ext_resource type="Shader" path="res://addons/starlight/Star.gdshader" id="1_vx40u"]
+[ext_resource type="Texture2D" uid="uid://cweg0rded3pvf" path="res://addons/starlight/psf-textures/jwst.exr" id="2_y20kl"]
+
+[resource]
+render_priority = -128
+shader = ExtResource("1_vx40u")
+shader_parameter/emission_energy = 2e+09
+shader_parameter/billboard_size_deg = 60.0
+shader_parameter/min_size_ratio = 0.005
+shader_parameter/max_luminosity = 1000.0
+shader_parameter/meters_per_lightyear = 100.0
+shader_parameter/distance_limit = 1.0
+shader_parameter/camera_vertical_fov = 70.0
+shader_parameter/debug_show_rects = false
+shader_parameter/texture_emission = ExtResource("2_y20kl")
