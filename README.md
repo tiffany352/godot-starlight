@@ -1,7 +1,7 @@
 # Starlight for Godot 4.1
 
 [![GitHub link](https://img.shields.io/github/license/tiffany352/godot-starlight)](https://github.com/tiffany352/godot-starlight)
-[![Godot asset library](https://img.shields.io/badge/godot-assets-blue)](https://godotengine.org/asset-library/asset/9207)
+[![Godot asset library](https://img.shields.io/badge/godot-assets-blue)](https://godotengine.org/asset-library/asset/2221)
 
 ![Screenshot](docs/screenshot.jpg)
 (Planet rendered using [Atmosphere Shader v0.4](https://godotengine.org/asset-library/asset/2002))
