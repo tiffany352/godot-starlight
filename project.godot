@@ -11,5 +11,6 @@ config_version=5
 [application]
 
 config/name="godot-starlight"
+run/main_scene="res://demo/demo.tscn"
 config/features=PackedStringArray("4.1", "Forward Plus")
 config/icon="res://icon.png"
