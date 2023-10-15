@@ -1,19 +1,23 @@
 shader_type spatial;
 render_mode blend_add,depth_draw_never,cull_front,shadows_disabled,skip_vertex_transform,unshaded;
 
-
+// Visual properties:
 uniform sampler2D texture_emission : hint_default_black;
 uniform float emission_energy;
 uniform float billboard_size_deg : hint_range(0, 90) = 90;
-uniform float min_size_ratio : hint_range(0, 1.0) = 1.0;
-uniform float scaling_gamma : hint_range(0.0, 2.0) = 1.0;
-uniform float max_luminosity;
-uniform float meters_per_lightyear = 100.0;
 uniform float luminosity_cap = 1e300;
-uniform float camera_vertical_fov = 70;
+uniform float meters_per_lightyear = 100.0;
 uniform float color_gamma : hint_range(0.0, 10.0) = 1.0;
-uniform bool debug_show_rects = false;
 uniform bool clamp_output = false;
+
+// This should really be a godot shader builtin.
+uniform float camera_vertical_fov = 70;
+
+// PSF cropping related uniforms:
+uniform float min_size_ratio : hint_range(0, 1.0) = 1.0;
+uniform float max_luminosity;
+uniform float scaling_gamma : hint_range(0.0, 2.0) = 1.0;
+uniform bool debug_show_rects = false;
 
 
 varying vec3 STAR_COLOR;

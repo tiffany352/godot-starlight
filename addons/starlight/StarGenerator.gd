@@ -1,9 +1,14 @@
 @tool
 extends "res://addons/starlight/StarManager.gd"
+## Procedurally generates main sequence stars and populates StarManager with them.
 
+## Radius of a sphere in which to place stars.
 @export var size: float = 5000: set = _set_extents
+## Number of stars to generate.
 @export var star_count: int = 10000: set = _set_star_count
+## RNG seed, which can be used to re-roll the random generation.
 @export var rng_seed: int = 1234: set = _set_rng_seed
+## If set to true, a Sol-like star will be placed at 0,0,0.
 @export var generate_at_origin: bool = false: set = _set_generate_at_origin
 
 

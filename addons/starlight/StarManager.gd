@@ -5,6 +5,7 @@ extends Node3D
 @export var shader: Shader
 
 
+## Class used to represent stars for StarManager. Passed to set_star_list().
 class Star:
 	# Position of the star.
 	var position: Vector3
@@ -19,6 +20,11 @@ class Star:
 		self.temperature = temperature
 
 
+## Most stars have an "Effective temperature" which is the black body temperature that most closely
+## matches their emitted spectra.
+##
+## This describes the color of the star as a single value, a temperature in Kelvin, from the range
+## of ~500 through to 60,000 and beyond.
 static func blackbody_to_rgb(kelvin):
 	var temperature = kelvin / 100.0
 	var red
@@ -101,11 +107,14 @@ static func blackbody_to_rgb(kelvin):
 
 var material: ShaderMaterial
 var mesh: MultiMesh
+# Hide these parameters because they're set by StarManager:
 var internal_shader_params = {
 	'camera_vertical_fov': true
 }
 
 
+# This forwards the shader parameters, which would otherwise be inaccessible because the Material
+# is generated at runtime.
 func _get_property_list():
 	var props = []
 	var shader_params := RenderingServer.get_shader_parameter_list(shader.get_rid())
@@ -137,6 +146,10 @@ func _set(p_key: StringName, value):
 		material.set_shader_parameter(param_name, value)
 
 
+# In order to render the stars without polluting the .tscn file with MultiMesh buffer data, this
+# technique is used of creating the instance and adding it as a child in _init(). This somehow
+# doesn't actually add the child to the scene in the editor, even though the code is running as a
+# tool script.
 func _init():
 	material = ShaderMaterial.new()
 	material.shader = shader
@@ -174,6 +187,8 @@ func set_star_list(star_list: Array[Star]):
 func _process(_delta):
 	var camera = get_viewport().get_camera_3d()
 	var fov = 70
+	# The camera can be null if the scene doesn't have one set.
+	# This value will also not match the editor camera.
 	if camera:
 		fov = camera.fov
 
