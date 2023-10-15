@@ -1,5 +1,8 @@
 @tool
-extends MultiMeshInstance3D
+extends Node3D
+
+
+@export var shader: Shader
 
 
 class Star:
@@ -16,16 +19,7 @@ class Star:
 		self.temperature = temperature
 
 
-var _rebuild_instances = true
-var _star_list: Array[Star] = []
-
-
-func set_star_list(star_list: Array[Star]):
-	_rebuild_instances = true
-	_star_list = star_list
-
-
-func blackbody_to_rgb(kelvin):
+static func blackbody_to_rgb(kelvin):
 	var temperature = kelvin / 100.0
 	var red
 	var green
@@ -105,20 +99,83 @@ func blackbody_to_rgb(kelvin):
 	return Color(red / 255.0, green / 255.0, blue / 255.0)
 
 
-func _process(_delta):
-	if not _rebuild_instances:
-		return
+var material: ShaderMaterial
+var mesh: MultiMesh
+var internal_shader_params = {
+	'camera_vertical_fov': true
+}
 
-	_rebuild_instances = false
+
+func _get_property_list():
+	var props = []
+	var shader_params := RenderingServer.get_shader_parameter_list(shader.get_rid())
+	for p in shader_params:
+		if internal_shader_params.has(p.name):
+			continue
+		var cp = {}
+		for k in p:
+			cp[k] = p[k]
+		cp.name = str("shader_params/", p.name)
+		props.append(cp)
+	return props
+
+
+func _get(p_key: StringName):
+	var key = String(p_key)
+	if key.begins_with("shader_params/"):
+		var param_name = key.substr(len("shader_params/"))
+		var value = material.get_shader_parameter(param_name)
+		if value == null:
+			value = RenderingServer.shader_get_parameter_default(material.shader, param_name)
+		return value
+
+
+func _set(p_key: StringName, value):
+	var key = String(p_key)
+	if key.begins_with("shader_params/"):
+		var param_name := key.substr(len("shader_params/"))
+		material.set_shader_parameter(param_name, value)
+
+
+func _init():
+	material = ShaderMaterial.new()
+	material.shader = shader
+
+	var quad = QuadMesh.new()
+	quad.orientation = PlaneMesh.FACE_Z
+	quad.size = Vector2(1, 1)
+	quad.material = material
+
+	mesh = MultiMesh.new()
+	mesh.transform_format = MultiMesh.TRANSFORM_3D
+	mesh.use_colors = true
+	mesh.use_custom_data = true
+	mesh.mesh = quad
+
+	var inst = MultiMeshInstance3D.new()
+	inst.multimesh = mesh
+
+	add_child(inst)
+
+
+func set_star_list(star_list: Array[Star]):
 	# Throws an error when trying to set properties otherwise.
-	multimesh.instance_count = 0
-	multimesh.use_colors = true
-	multimesh.use_custom_data = true
-	multimesh.instance_count = _star_list.size()
+	mesh.instance_count = 0
+	mesh.instance_count = star_list.size()
 
-	for i in range(_star_list.size()):
-		var star = _star_list[i]
+	for i in range(star_list.size()):
+		var star = star_list[i]
 		var transform = Transform3D().translated(star.position)
-		multimesh.set_instance_transform(i, transform)
-		multimesh.set_instance_color(i, blackbody_to_rgb(star.temperature))
-		multimesh.set_instance_custom_data(i, Color(star.luminosity, 0, 0))
+		mesh.set_instance_transform(i, transform)
+		mesh.set_instance_color(i, blackbody_to_rgb(star.temperature))
+		mesh.set_instance_custom_data(i, Color(star.luminosity, 0, 0))
+
+
+func _process(_delta):
+	var camera = get_viewport().get_camera_3d()
+	var fov = 70
+	if camera:
+		fov = camera.fov
+
+	material.shader = shader
+	material.set_shader_parameter('camera_vertical_fov', fov)

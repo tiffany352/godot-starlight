@@ -1,16 +1,19 @@
 shader_type spatial;
-render_mode blend_add,depth_draw_opaque,cull_disabled,diffuse_burley,specular_schlick_ggx,shadows_disabled,ambient_light_disabled,skip_vertex_transform,unshaded;
+render_mode blend_add,depth_draw_never,cull_front,shadows_disabled,skip_vertex_transform,unshaded;
 
 
 uniform sampler2D texture_emission : hint_default_black;
 uniform float emission_energy;
 uniform float billboard_size_deg : hint_range(0, 90) = 90;
 uniform float min_size_ratio : hint_range(0, 1.0) = 1.0;
+uniform float scaling_gamma : hint_range(0.0, 2.0) = 1.0;
 uniform float max_luminosity;
 uniform float meters_per_lightyear = 100.0;
-uniform float distance_limit = 1.0;
+uniform float luminosity_cap = 1e300;
 uniform float camera_vertical_fov = 70;
+uniform float color_gamma : hint_range(0.0, 10.0) = 1.0;
 uniform bool debug_show_rects = false;
+uniform bool clamp_output = false;
 
 
 varying vec3 STAR_COLOR;
@@ -23,7 +26,6 @@ const float lightyear_length = 9.460730e15;
 void vertex() {
 	// Find distance from camera
 	float dist = -(MODELVIEW_MATRIX * vec4(vec3(0.0), 1.0)).z;
-	dist = max(dist, distance_limit);
 	// Use lightyear scaling ratio, then convert back to meters.
 	highp float dist_adj = dist * (lightyear_length / meters_per_lightyear);
 
@@ -31,14 +33,17 @@ void vertex() {
 	// Combine these first because one is very large and one is very small.
 	highp float emission = luminosity_sun * dimming;
 	float luminosity = INSTANCE_CUSTOM.r * emission_energy * emission;
-	STAR_COLOR = COLOR.rgb * luminosity;
+	luminosity = min(luminosity, luminosity_cap);
+	STAR_COLOR = pow(COLOR.rgb, vec3(color_gamma)) * luminosity;
 
 	// Next do cropping, which is important for performance. Otherwise rendering thousands of PSF textures overlapping will create tons of overdraw.
 	// The idea here is that the PSF texture is not scaled down, instead it's cropped towards the center, based on how bright we expect it to be.
 	// Values towards the edges are extremely dim, so if the luminance is not high then they will round to zero.
-	float size = mix(min_size_ratio * billboard_size_deg, billboard_size_deg, clamp(luminosity / max_luminosity, 0.0, 1.0));
-	float crop = size / billboard_size_deg;
-	UV = (UV - vec2(0.5)) * crop + vec2(0.5);
+	float scale_ratio = clamp(luminosity / max_luminosity, 0.0, 1.0);
+	scale_ratio = pow(scale_ratio, scaling_gamma);
+	scale_ratio = mix(min_size_ratio, 1.0, scale_ratio);
+	float size = scale_ratio * billboard_size_deg;
+	UV = (UV - vec2(0.5)) * scale_ratio + vec2(0.5);
 
 	// Billboard rotation locking.
 	MODELVIEW_MATRIX = VIEW_MATRIX * mat4(INV_VIEW_MATRIX[0],INV_VIEW_MATRIX[1],INV_VIEW_MATRIX[2],MODEL_MATRIX[3]);
@@ -70,7 +75,8 @@ vec3 to_srgb(vec3 linearRGB)
 void fragment() {
 	vec3 emission_tex = texture(texture_emission, UV).rgb;
 	vec3 color = STAR_COLOR * emission_tex;
-	color = clamp(color, 0.0, 1.0);
+	if (clamp_output)
+		color = clamp(color, 0.0, 1.0);
 
 	// Useful when debugging min_size_deg/max_luminance:
 	if (debug_show_rects)
