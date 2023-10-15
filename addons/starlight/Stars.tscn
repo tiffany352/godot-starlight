@@ -7,7 +7,6 @@
 [node name="Stars" type="Node3D"]
 script = ExtResource("1_u877o")
 shader = ExtResource("2_6rhhm")
-generate_default_star = true
 shader_params/emission_energy = 1e+07
 shader_params/billboard_size_deg = 90.0
 shader_params/min_size_ratio = 0.003
