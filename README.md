@@ -143,12 +143,12 @@ from the scene.
 Code is released under [MIT license](./LICENSE.md).
 
 The default PSF texture, `jwst.exr`, is based on FITS data [obtained
-from here][3]. Code for cropping, downscaling, and converting to OpenEXR
+from here][5]. Code for cropping, downscaling, and converting to OpenEXR
 is located in `docs/fits2exr.py`.
 
 The alternative PSF textures `hst.exr`, `hex_aperture.exr`, and
-`airy_disk.exr` were created using [Poppy][4] based on examples in the
+`airy_disk.exr` were created using [Poppy][6] based on examples in the
 documentation. Code is located in `docs/poppy psfs.ipynb`.
 
-[3]: https://www.stsci.edu/jwst/science-planning/proposal-planning-toolbox/simulated-data
-[4]: https://poppy-optics.readthedocs.io/en/latest/
+[5]: https://www.stsci.edu/jwst/science-planning/proposal-planning-toolbox/simulated-data
+[6]: https://poppy-optics.readthedocs.io/en/latest/
