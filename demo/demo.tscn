@@ -1,10 +1,13 @@
-[gd_scene load_steps=8 format=3 uid="uid://cwy238cxfbs2q"]
+[gd_scene load_steps=11 format=3 uid="uid://cwy238cxfbs2q"]
 
-[ext_resource type="PackedScene" uid="uid://b0nt4n13a6448" path="res://addons/starlight/Stars.tscn" id="1_xvs24"]
+[ext_resource type="PackedScene" uid="uid://bi0abq4kse8g5" path="res://addons/starlight/Stars.tscn" id="1_xvs24"]
 [ext_resource type="Script" path="res://addons/starlight/StarGenerator.gd" id="2_6mf2e"]
+[ext_resource type="Shader" path="res://addons/starlight/star_pixel_art.gdshader" id="3_rf6gr"]
 [ext_resource type="Script" path="res://demo/Camera3D.gd" id="3_s6lel"]
+[ext_resource type="Texture2D" uid="uid://bjfxukgyu1icc" path="res://addons/starlight/psf-textures/pixelart.png" id="4_kmfps"]
 [ext_resource type="Script" path="res://demo/FPSCounter.gd" id="4_vr3pp"]
 [ext_resource type="Script" path="res://demo/HelpText.gd" id="5_dkbb2"]
+[ext_resource type="Script" path="res://demo/ToggleMode.gd" id="8_dcb6l"]
 
 [sub_resource type="Environment" id="Environment_ah14t"]
 background_energy_multiplier = 0.0
@@ -17,7 +20,27 @@ ambient_light_energy = 0.0
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_ah14t")
 
+[node name="PixelStars" parent="." instance=ExtResource("1_xvs24")]
+unique_name_in_owner = true
+visible = false
+script = ExtResource("2_6mf2e")
+size = 10000.0
+star_count = 100000
+rng_seed = 1234
+generate_at_origin = true
+shader = ExtResource("3_rf6gr")
+shader_params/emission_energy = 2e+06
+shader_params/billboard_size_deg = 30.0
+shader_params/luminosity_cap = 1000.0
+shader_params/min_size_ratio = 0.01
+shader_params/max_luminosity = 100.0
+shader_params/scaling_gamma = 0.4
+shader_params/clamp_output = true
+shader_params/falloff_offset = 0.05
+shader_params/texture_emission = ExtResource("4_kmfps")
+
 [node name="Stars" parent="." instance=ExtResource("1_xvs24")]
+unique_name_in_owner = true
 script = ExtResource("2_6mf2e")
 size = 10000.0
 star_count = 100000
@@ -55,6 +78,7 @@ offset_top = -274.0
 offset_right = 298.0
 offset_bottom = -5.0
 grow_vertical = 0
+alignment = 2
 vertical = true
 
 [node name="HelpText" type="Label" parent="BoxContainer"]
@@ -73,3 +97,8 @@ star count: 100 000"
 layout_mode = 2
 text = "hide"
 script = ExtResource("5_dkbb2")
+
+[node name="ToggleMode" type="Button" parent="BoxContainer"]
+layout_mode = 2
+text = "toggle mode"
+script = ExtResource("8_dcb6l")

@@ -1,14 +1,9 @@
-shader_type spatial;
-render_mode blend_add,depth_draw_never,cull_front,shadows_disabled,skip_vertex_transform,unshaded;
-
 // Visual properties:
-uniform sampler2D texture_emission : hint_default_black;
 uniform float emission_energy;
 uniform float billboard_size_deg : hint_range(0, 90) = 90;
 uniform float luminosity_cap = 1e300;
 uniform float meters_per_lightyear = 100.0;
 uniform float color_gamma : hint_range(0.0, 10.0) = 1.0;
-uniform bool clamp_output = false;
 
 // This should really be a godot shader builtin.
 uniform float camera_vertical_fov = 70;
@@ -17,7 +12,6 @@ uniform float camera_vertical_fov = 70;
 uniform float min_size_ratio : hint_range(0, 1.0) = 1.0;
 uniform float max_luminosity;
 uniform float scaling_gamma : hint_range(0.0, 2.0) = 1.0;
-uniform bool debug_show_rects = false;
 
 
 varying vec3 STAR_COLOR;
@@ -73,26 +67,4 @@ vec3 to_srgb(vec3 linearRGB)
     vec3 lower = linearRGB * vec3(12.92);
 
     return vec3(mix(higher, lower, cutoff));
-}
-
-
-void fragment() {
-	vec3 emission_tex = texture(texture_emission, UV).rgb;
-	vec3 color = STAR_COLOR * emission_tex;
-	if (clamp_output)
-		color = clamp(color, 0.0, 1.0);
-
-	// Useful when debugging min_size_deg/max_luminance:
-	if (debug_show_rects)
-		color += vec3(0.1);
-
-	// In compatibility renderer we need to convert to sRGB manually.
-	// Otherwise the result will look washed out.
-	if (OUTPUT_IS_SRGB)
-		color = to_srgb(color);
-
-	if (color.x < 0.001 && color.y < 0.001 && color.z < 0.001)
-		discard;
-
-	ALBEDO = color;
 }

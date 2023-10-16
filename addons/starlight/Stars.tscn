@@ -1,20 +1,20 @@
-[gd_scene load_steps=4 format=3 uid="uid://b0nt4n13a6448"]
+[gd_scene load_steps=4 format=3 uid="uid://bi0abq4kse8g5"]
 
 [ext_resource type="Script" path="res://addons/starlight/StarManager.gd" id="1_u877o"]
-[ext_resource type="Shader" path="res://addons/starlight/Star.gdshader" id="2_6rhhm"]
+[ext_resource type="Shader" path="res://addons/starlight/star_normal.gdshader" id="2_8pm7t"]
 [ext_resource type="Texture2D" uid="uid://cweg0rded3pvf" path="res://addons/starlight/psf-textures/jwst.exr" id="3_wqe40"]
 
 [node name="Stars" type="Node3D"]
 script = ExtResource("1_u877o")
-shader = ExtResource("2_6rhhm")
+shader = ExtResource("2_8pm7t")
 shader_params/emission_energy = 1e+07
 shader_params/billboard_size_deg = 90.0
 shader_params/luminosity_cap = 4e+06
 shader_params/meters_per_lightyear = 100.0
 shader_params/color_gamma = 4.0
-shader_params/clamp_output = false
 shader_params/min_size_ratio = 0.003
 shader_params/max_luminosity = 100000.0
 shader_params/scaling_gamma = 0.5
+shader_params/clamp_output = false
 shader_params/debug_show_rects = false
 shader_params/texture_emission = ExtResource("3_wqe40")
