@@ -6,6 +6,9 @@
 ![Screenshot](docs/screenshot.jpg)
 (Planet rendered using [Atmosphere Shader v0.4](https://godotengine.org/asset-library/asset/2002))
 
+![Pixel art version](docs/screenshot-pixelart.png)
+(Pixel art variant available)
+
 Starlight is a Godot addon that renders 100 000 stars in realtime, with
 low performance cost. It's an alternative to using a skybox, and
 also may be relevant to anyone making a space game.
@@ -73,7 +76,7 @@ The Star constructor takes 3 arguments:
 [3]: https://en.wikipedia.org/wiki/Solar_luminosity
 [4]: https://en.wikipedia.org/wiki/Effective_temperature
 
-## Star.gdshader
+## star_normal.gdshader
 
 The following visual properties are exposed:
 
@@ -137,6 +140,34 @@ viewport, but in some cases this auto-detection may be wrong, and you
 will need to edit StarManager.gd for your needs. It also does not
 display correctly in the editor due to it using different FOV settings
 from the scene.
+
+## star_pixel_art.gdshader
+
+For pixel art mode there is 1 extra setting `falloff_offset`. This
+setting controls how sharp vs diffuse the texture should appear. Lower
+values are sharper. It's mostly a matter of tweaking it until it looks
+right, but generally this is some low value like 0.05.
+
+Some tips for authoring pixel art PSF textures:
+
+The shader applies an inverse square falloff from the center. An
+even-sized texture is expected, "The center" is the pixel in the lower
+right of the central 2x2.
+
+Diffraction spikes (the lines that come shooting out) should have a
+constant brightness in your texture due to the falloff already being
+applied. Other parts, like the central glowy part, should be a gradient
+from the center. The centermost pixel should be pure white.
+
+The alpha channel is not used. Your texture should overall be white,
+unless you want to deliberately introduce a tint applied on top of the
+existing star colors. Some color can be used for chromatic aberration.
+
+When authoring the texture, a good workflow is to use multiple layers
+and set them all to additive blending. Some layers you may want to
+duplicate into separate red, green, and blue channels. These channels
+can then be scaled slightly reltaive to each other, to create chromatic
+aberration.
 
 # Credit
 
