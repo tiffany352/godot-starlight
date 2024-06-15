@@ -107,11 +107,6 @@ static func blackbody_to_rgb(kelvin):
 
 var material: ShaderMaterial
 var mesh: MultiMesh
-# Hide these parameters because they're set by StarManager:
-var internal_shader_params = {
-	'camera_vertical_fov': true
-}
-
 
 # This forwards the shader parameters, which would otherwise be inaccessible because the Material
 # is generated at runtime.
@@ -119,8 +114,6 @@ func _get_property_list():
 	var props = []
 	var shader_params := RenderingServer.get_shader_parameter_list(shader.get_rid())
 	for p in shader_params:
-		if internal_shader_params.has(p.name):
-			continue
 		var cp = {}
 		for k in p:
 			cp[k] = p[k]
@@ -185,12 +178,4 @@ func set_star_list(star_list: Array[Star]):
 
 
 func _process(_delta):
-	var camera = get_viewport().get_camera_3d()
-	var fov = 70
-	# The camera can be null if the scene doesn't have one set.
-	# This value will also not match the editor camera.
-	if camera:
-		fov = camera.fov
-
-	material.shader = shader
-	material.set_shader_parameter('camera_vertical_fov', fov)
+	pass

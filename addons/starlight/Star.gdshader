@@ -10,9 +10,6 @@ uniform float meters_per_lightyear = 100.0;
 uniform float color_gamma : hint_range(0.0, 10.0) = 1.0;
 uniform bool clamp_output = false;
 
-// This should really be a godot shader builtin.
-uniform float camera_vertical_fov = 70;
-
 // PSF cropping related uniforms:
 uniform float min_size_ratio : hint_range(0, 1.0) = 1.0;
 uniform float max_luminosity;
@@ -57,6 +54,7 @@ void vertex() {
 	// Do actual perspective projection.
 	vec4 projected = PROJECTION_MATRIX * vec4(modelview_pos, 1.0);
 	// Figure out the scaling to use in clip space so that we can measure in degrees instead of device pixels.
+	float camera_vertical_fov = degrees(atan(-1.0 / PROJECTION_MATRIX[1][1]) * 2.0);
 	vec2 one_degree = vec2(1.0, VIEWPORT_SIZE.x / VIEWPORT_SIZE.y) / camera_vertical_fov;
 	// Offset the projected position to form the quad.
 	POSITION = projected + vec4(VERTEX.xy * projected.w * size * one_degree, 0.0, 0.0);
