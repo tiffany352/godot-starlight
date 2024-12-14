@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 
-# Modified by Tiffany for the purposes of creating the JWST EXR file.
-# Original description:
+# Converts the JWST simulated PSF to the packed PNG format expected by
+# the godot-starlight addon. The source PSF images must be obtained in
+# FITS format from here:
+# <https://www.stsci.edu/jwst/science-planning/proposal-planning-toolbox/simulated-data>
+
+# This script was adapted by me (Tiffany) from a FITS-to-EXR conversion
+# script, the original description follows.
 
 # Presented by Min-Su Shin 
 # (2015 - , KASI, Republic of Korea)
@@ -19,10 +24,10 @@
 # check the output EXR files.
 
 from astropy.io import fits
-import OpenEXR
 import numpy
 from img_scale import cbrt
 from skimage.measure import block_reduce
+from PIL import Image
 
 # read FITS images
 # red channel
@@ -64,33 +69,51 @@ def crop_center(img,cropx,cropy):
     starty = y//2 - cropy//2    
     return img[starty:starty+cropy, startx:startx+cropx]
 
-width = 4096
-height = 4096
+width = 2048
+height = 2048
 r_img_data = crop_center(r_img_data, width, height)
 g_img_data = crop_center(g_img_data, width, height)
 b_img_data = crop_center(b_img_data, width, height)
 
-downscale = 4
+downscale = 1
 
-r_img_data = block_reduce(r_img_data, block_size=(downscale,downscale), func=numpy.sum, cval=numpy.sum(r_img_data))
-g_img_data = block_reduce(g_img_data, block_size=(downscale,downscale), func=numpy.sum, cval=numpy.sum(r_img_data))
-b_img_data = block_reduce(b_img_data, block_size=(downscale,downscale), func=numpy.sum, cval=numpy.sum(r_img_data))
-width = width // downscale
-height = height // downscale
+if downscale != 1:
+  r_img_data = block_reduce(r_img_data, block_size=(downscale,downscale), func=numpy.sum, cval=numpy.sum(r_img_data))
+  g_img_data = block_reduce(g_img_data, block_size=(downscale,downscale), func=numpy.sum, cval=numpy.sum(r_img_data))
+  b_img_data = block_reduce(b_img_data, block_size=(downscale,downscale), func=numpy.sum, cval=numpy.sum(r_img_data))
+  width = width // downscale
+  height = height // downscale
 
-# write an EXR file
-exr_fn = "jwst_psf.exr"
-r_img_data = numpy.asarray(r_img_data, dtype=numpy.float32)
-r_img_data = r_img_data.tobytes()
-g_img_data = numpy.asarray(g_img_data, dtype=numpy.float32)
-g_img_data = g_img_data.tobytes()
-b_img_data = numpy.asarray(b_img_data, dtype=numpy.float32)
-b_img_data = b_img_data.tobytes()
-header = OpenEXR.Header(width, height)
-out_exr = OpenEXR.OutputFile(exr_fn, header)
-out_exr.writePixels({
-    'R': r_img_data,
-    'G': g_img_data,
-    'B': b_img_data,
-})
-print("write the EXR file ",exr_fn," done...")
+coords = numpy.mgrid[0:width, 0:height]
+xcoord = coords[0] - (width / 2)
+ycoord = coords[1] - (height / 2)
+dist_sq = xcoord * xcoord + ycoord * ycoord + 0
+
+r_img_data = r_img_data * dist_sq
+g_img_data = g_img_data * dist_sq
+b_img_data = b_img_data * dist_sq
+
+r_max = numpy.max(r_img_data)
+g_max = numpy.max(g_img_data)
+b_max = numpy.max(b_img_data)
+
+r_img_data = r_img_data / r_max
+g_img_data = g_img_data / g_max
+b_img_data = b_img_data / b_max
+
+b = 1000
+log_b = numpy.log(b)
+r_img_data = numpy.log(1.0 + r_img_data * (b - 1.0)) / log_b
+g_img_data = numpy.log(1.0 + g_img_data * (b - 1.0)) / log_b
+b_img_data = numpy.log(1.0 + b_img_data * (b - 1.0)) / log_b
+
+print("max values: ", r_max, g_max, b_max)
+
+r_img_data = numpy.asarray(r_img_data * 255.0, dtype=numpy.uint8)
+g_img_data = numpy.asarray(g_img_data * 255.0, dtype=numpy.uint8)
+b_img_data = numpy.asarray(b_img_data * 255.0, dtype=numpy.uint8)
+
+rgb = numpy.dstack((r_img_data, g_img_data, b_img_data))
+
+image = Image.fromarray(rgb)
+image.save("jwst.png")

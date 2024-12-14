@@ -10,7 +10,7 @@ Starlight is a Godot addon that renders 100 000 stars in realtime, with
 low performance cost. It's an alternative to using a skybox, and
 also may be relevant to anyone making a space game.
 
-Check out the demo in your web browser: https://tiffnix.com/starlight-demo/
+Check out the demo in your web browser: https://tiffnix.com/starlight-demo
 
 # Features
 
@@ -86,7 +86,7 @@ The following visual properties are exposed:
   of 3 or 4 is a good balance.
 - `billboard_size_deg` - This controls how much of the screen the PSF
   texture takes up, in degrees. For the default JWST PSF I recommend a
-  value of around 90.
+  value of around 45.
 - `meters_per_lightyear` - This is a scaling setting, you'll need to set
   it depending on how far away you want your stars to be.
 - `luminosity_cap` - This is the maximum brightness a star can have. The
@@ -97,6 +97,9 @@ The following visual properties are exposed:
   is the PSF from the James Webb Space Telescope, because it looks cool.
   There are a few others in the `psf-textures` folder which can be used
   instead.
+- `texture_emission_tint` - A tint value applied to the PSF texture. The
+  provided PSF textures need a tint value to look correct, there is a
+  table in psf-textures/README.md.
 - `clamp_output` - Clamps the output from 0 to 1 when enabled. Can be
   useful depending on how your HDR is setup.
 
@@ -119,7 +122,7 @@ behavior, the shader has these properties:
   max_luminosity until it's just below that point.
 - `scaling_gamma` - Diffraction spikes usually fall in brightness
   according to distance^2 from the center of the texture, which means a
-  value of 0.5 is ideal. You may need to use other values depending on
+  value of ~0.5 is ideal. You may need to use other values depending on
   your PSF texture. For a perfect airy disk in particular, the falloff
   is faster than quadratic.
 - `debug_show_rects` - This can be useful while tweaking any of these
@@ -142,13 +145,13 @@ from the scene.
 
 Code is released under [MIT license](./LICENSE.md).
 
-The default PSF texture, `jwst.exr`, is based on FITS data [obtained
-from here][5]. Code for cropping, downscaling, and converting to OpenEXR
-is located in `docs/fits2exr.py`.
+The default PSF texture, `jwst.png`, is based on FITS data [obtained
+from here][5]. Code for cropping, downscaling, and packing into PNG
+is located in `docs/jwst2png.py`.
 
-The alternative PSF textures `hst.exr`, `hex_aperture.exr`, and
-`airy_disk.exr` were created using [Poppy][6] based on examples in the
-documentation. Code is located in `docs/poppy psfs.ipynb`.
+The alternative PSF textures `hst.png`, `hex_aperture.png`, and
+`airy_disk.png` were created using [Poppy][6] based on examples in the
+documentation. Code is located in `docs/poppy_psfs.ipynb`.
 
 [5]: https://www.stsci.edu/jwst/science-planning/proposal-planning-toolbox/simulated-data
 [6]: https://poppy-optics.readthedocs.io/en/latest/
