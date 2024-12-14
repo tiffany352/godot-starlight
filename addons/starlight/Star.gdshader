@@ -61,9 +61,20 @@ void vertex() {
 	vec2 one_degree = vec2(1.0, VIEWPORT_SIZE.x / VIEWPORT_SIZE.y) / camera_vertical_fov;
 	// Offset the projected position to form the quad.
 	POSITION = projected + vec4(VERTEX.xy * projected.w * size * one_degree, 0.0, 0.0);
+
 	// Force Z value to far clip plane so that it will always render behind everything else.
 	// This also prevents it being clipped, which lets stars be seen from much further away than the camera far plane would normally allow.
-	POSITION.z = -1.0 * projected.w;
+	//
+	// Doing this in Godot 4.3 is different depending on the renderer, requiring hacks.
+	// Godot 4.4 adds some new macros that make this less painful.
+	// <https://github.com/godotengine/godot/issues/100310#issuecomment-2542388318>
+	//
+	// POSITION.z = CLIP_SPACE_FAR * projected.w;
+	if (OUTPUT_IS_SRGB) {
+		POSITION.z = -1.0 * projected.w;
+	} else {
+		POSITION.z = 0.0 * projected.w;
+	}
 }
 
 
