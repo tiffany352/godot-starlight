@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cwgi2fpms5fll"
 path.s3tc="res://.godot/imported/airy_disk.png-b87b212e1b7493b4ba80a0a063c16993.s3tc.ctex"
+path.etc2="res://.godot/imported/airy_disk.png-b87b212e1b7493b4ba80a0a063c16993.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://addons/starlight/psf-textures/airy_disk.png"
-dest_files=["res://.godot/imported/airy_disk.png-b87b212e1b7493b4ba80a0a063c16993.s3tc.ctex"]
+dest_files=["res://.godot/imported/airy_disk.png-b87b212e1b7493b4ba80a0a063c16993.s3tc.ctex", "res://.godot/imported/airy_disk.png-b87b212e1b7493b4ba80a0a063c16993.etc2.ctex"]
 
 [params]
 
