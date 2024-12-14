@@ -2,12 +2,15 @@ shader_type spatial;
 render_mode blend_add,depth_draw_never,cull_front,shadows_disabled,skip_vertex_transform,unshaded;
 
 // Visual properties:
-uniform sampler2D texture_emission : hint_default_black;
+uniform sampler2D texture_emission : hint_default_black, filter_linear_mipmap;
+uniform vec3 texture_emission_tint;
+uniform float blur_amount : hint_range(0.0, 1.0) = 0.5;
 uniform float emission_energy;
 uniform float billboard_size_deg : hint_range(0, 90) = 90;
 uniform float luminosity_cap = 1e300;
 uniform float meters_per_lightyear = 100.0;
 uniform float color_gamma : hint_range(0.0, 10.0) = 1.0;
+uniform float texture_gamma = 1000.0;
 uniform bool clamp_output = false;
 
 // PSF cropping related uniforms:
@@ -60,7 +63,7 @@ void vertex() {
 	POSITION = projected + vec4(VERTEX.xy * projected.w * size * one_degree, 0.0, 0.0);
 	// Force Z value to far clip plane so that it will always render behind everything else.
 	// This also prevents it being clipped, which lets stars be seen from much further away than the camera far plane would normally allow.
-	POSITION.z = 1.0 * projected.w;
+	POSITION.z = -1.0 * projected.w;
 }
 
 
@@ -76,6 +79,10 @@ vec3 to_srgb(vec3 linearRGB)
 
 void fragment() {
 	vec3 emission_tex = texture(texture_emission, UV).rgb;
+	vec2 pixel_size = fwidth(UV * 1024.0);
+	vec2 pos = vec2(UV * 1024.0 - 512.0);
+	float dist = dot(pos, pos) + 1.0 + pixel_size.x * blur_amount;
+	emission_tex = (pow(vec3(texture_gamma), emission_tex / dist) - 1.0) / vec3(999.0) * texture_emission_tint;
 	vec3 color = STAR_COLOR * emission_tex;
 	if (clamp_output)
 		color = clamp(color, 0.0, 1.0);

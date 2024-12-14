@@ -23,8 +23,6 @@ size = 10000.0
 star_count = 100000
 rng_seed = 1234
 generate_at_origin = true
-shader_params/emission_energy = 5e+08
-shader_params/clamp_output = true
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 38.6718)

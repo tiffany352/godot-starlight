@@ -3,6 +3,7 @@ extends Node3D
 
 
 @export var shader: Shader
+@export var visible_instance_count: int = -1
 
 
 ## Class used to represent stars for StarManager. Passed to set_star_list().
@@ -127,7 +128,7 @@ func _get(p_key: StringName):
 	if key.begins_with("shader_params/"):
 		var param_name = key.substr(len("shader_params/"))
 		var value = material.get_shader_parameter(param_name)
-		if value == null:
+		if value == null and material.shader != null:
 			value = RenderingServer.shader_get_parameter_default(material.shader, param_name)
 		return value
 
@@ -178,4 +179,5 @@ func set_star_list(star_list: Array[Star]):
 
 
 func _process(_delta):
-	pass
+	material.shader = shader
+	mesh.visible_instance_count = visible_instance_count

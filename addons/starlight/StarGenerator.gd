@@ -189,4 +189,3 @@ func _process(delta):
 	set_star_list(stars)
 
 	super._process(delta)
-
