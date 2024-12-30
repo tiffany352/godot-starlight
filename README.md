@@ -1,4 +1,4 @@
-# Starlight for Godot 4.1
+# Starlight for Godot 4.3
 
 [![GitHub link](https://img.shields.io/github/license/tiffany352/godot-starlight)](https://github.com/tiffany352/godot-starlight)
 [![Godot asset library](https://img.shields.io/badge/godot-assets-blue)](https://godotengine.org/asset-library/asset/2221)
@@ -11,6 +11,8 @@ low performance cost. It's an alternative to using a skybox, and
 also may be relevant to anyone making a space game.
 
 Check out the demo in your web browser: https://tiffnix.com/starlight-demo
+
+Article describing how this works: https://tiffnix.com/star-rendering
 
 # Features
 
