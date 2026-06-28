@@ -131,6 +131,7 @@ func _get(p_key: StringName):
 		if value == null and material.shader != null:
 			value = RenderingServer.shader_get_parameter_default(material.shader, param_name)
 		return value
+	return null
 
 
 func _set(p_key: StringName, value):
@@ -138,6 +139,8 @@ func _set(p_key: StringName, value):
 	if key.begins_with("shader_params/"):
 		var param_name := key.substr(len("shader_params/"))
 		material.set_shader_parameter(param_name, value)
+		return true
+	return false
 
 
 # In order to render the stars without polluting the .tscn file with MultiMesh buffer data, this
