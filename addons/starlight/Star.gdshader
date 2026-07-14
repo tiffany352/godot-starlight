@@ -13,6 +13,12 @@ uniform float color_gamma : hint_range(0.0, 10.0) = 1.0;
 uniform float texture_gamma = 1000.0;
 uniform bool clamp_output = false;
 
+// Twinkling effect parameters:
+uniform bool enable_twinkling = true;
+uniform float twinkle_speed : hint_range(0.1, 5.0) = 1.0;
+uniform float twinkle_intensity : hint_range(0.0, 1.0) = 0.3;
+uniform float time_offset_scale : hint_range(0.0, 100.0) = 10.0;
+
 // PSF cropping related uniforms:
 uniform float min_size_ratio : hint_range(0, 1.0) = 1.0;
 uniform float max_luminosity;
@@ -21,6 +27,7 @@ uniform bool debug_show_rects = false;
 
 
 varying vec3 STAR_COLOR;
+varying float STAR_TIME_OFFSET;
 
 
 const float luminosity_sun = 3.846e26;
@@ -33,6 +40,10 @@ void vertex() {
 	// Use lightyear scaling ratio, then convert back to meters.
 	highp float dist_adj = dist * (lightyear_length / meters_per_lightyear);
 
+	// Generate a unique time offset for each star based on its position
+	// This ensures stars twinkle at different times
+	STAR_TIME_OFFSET = fract(INSTANCE_CUSTOM.g * time_offset_scale);
+	
 	highp float dimming = 1.0 / (dist_adj * dist_adj);
 	// Combine these first because one is very large and one is very small.
 	highp float emission = luminosity_sun * dimming;
@@ -87,6 +98,19 @@ vec3 to_srgb(vec3 linearRGB)
     return vec3(mix(higher, lower, cutoff));
 }
 
+// Function to calculate twinkling factor based on time
+float calculate_twinkle(float time_offset) {
+    // Use multiple sine waves with different frequencies to create a more natural twinkle
+    float twinkle = sin(TIME * twinkle_speed + time_offset * 6.28) * 0.5
+                  + sin(TIME * twinkle_speed * 1.3 + time_offset * 3.14) * 0.3
+                  + sin(TIME * twinkle_speed * 0.7 + time_offset * 9.42) * 0.2;
+    
+    // Normalize to 0-1 range
+    twinkle = twinkle * 0.5 + 0.5;
+    
+    // Apply intensity (0 means no twinkling, 1 means full twinkling)
+    return mix(1.0, twinkle, twinkle_intensity);
+}
 
 void fragment() {
 	vec3 emission_tex = texture(texture_emission, UV).rgb;
@@ -94,7 +118,12 @@ void fragment() {
 	vec2 pos = vec2(UV * 1024.0 - 512.0);
 	float dist = dot(pos, pos) + 1.0 + pixel_size.x * blur_amount;
 	emission_tex = (pow(vec3(texture_gamma), emission_tex / dist) - 1.0) / vec3(999.0) * texture_emission_tint;
-	vec3 color = STAR_COLOR * emission_tex;
+	
+	// Apply twinkling effect if enabled
+	float twinkle_factor = enable_twinkling ? calculate_twinkle(STAR_TIME_OFFSET) : 1.0;
+	
+	vec3 color = STAR_COLOR * emission_tex * twinkle_factor;
+	
 	if (clamp_output)
 		color = clamp(color, 0.0, 1.0);
 

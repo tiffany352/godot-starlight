@@ -105,6 +105,17 @@ The following visual properties are exposed:
 - `clamp_output` - Clamps the output from 0 to 1 when enabled. Can be
   useful depending on how your HDR is setup.
 
+### Twinkling Effect
+
+The shader includes a star twinkling effect with these configurable parameters:
+
+- `enable_twinkling` - Toggle to enable/disable the twinkling effect.
+- `twinkle_speed` - Controls how fast stars twinkle (range 0.1-5.0). Higher values create faster twinkling.
+- `twinkle_intensity` - Controls how pronounced the twinkling effect is (range 0-1). Higher values create more dramatic brightness variations.
+- `time_offset_scale` - Controls the variation in twinkling phases between stars. Higher values create more randomness in the twinkling pattern.
+
+The twinkling effect uses multiple sine waves with different frequencies to create a natural, non-uniform twinkling pattern. Each star receives a unique random time offset to stagger the twinkling phase, resulting in a more dynamic night sky.
+
 In order to have good performance, the PSF texture needs to be cropped
 depending on how bright the star is on screen. The majority of stars
 only appear as a couple of pixels in size, as opposed to covering almost

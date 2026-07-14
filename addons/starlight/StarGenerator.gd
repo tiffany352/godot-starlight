@@ -10,7 +10,8 @@ extends "res://addons/starlight/StarManager.gd"
 @export var rng_seed: int = 1234: set = _set_rng_seed
 ## If set to true, a Sol-like star will be placed at 0,0,0.
 @export var generate_at_origin: bool = false: set = _set_generate_at_origin
-
+## Twinkling effect
+@export var INSTANCE_CUSTOM_g: float = 0.5: set = _set_INSTANCE_CUSTOM_g
 
 var _regenerate = true
 
@@ -32,6 +33,11 @@ func _set_rng_seed(value):
 
 func _set_generate_at_origin(value):
 	generate_at_origin = value
+	_regenerate = true
+
+
+func _set_INSTANCE_CUSTOM_g(value):
+	INSTANCE_CUSTOM_g = value
 	_regenerate = true
 
 

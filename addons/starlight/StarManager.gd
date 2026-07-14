@@ -14,11 +14,15 @@ class Star:
 	var luminosity: float
 	# Temperature of the star, in kelvin.
 	var temperature: float
+	# Time offset value for twinkling effect (0-1)
+	var time_offset: float
 
 	func _init(position: Vector3, luminosity: float, temperature: float):
 		self.position = position
 		self.luminosity = luminosity
 		self.temperature = temperature
+		# Initialize with a random time offset
+		self.time_offset = randf()
 
 
 ## Most stars have an "Effective temperature" which is the black body temperature that most closely
@@ -178,7 +182,8 @@ func set_star_list(star_list: Array[Star]):
 		var transform = Transform3D().translated(star.position)
 		mesh.set_instance_transform(i, transform)
 		mesh.set_instance_color(i, blackbody_to_rgb(star.temperature))
-		mesh.set_instance_custom_data(i, Color(star.luminosity, 0, 0))
+		# Store luminosity in r channel and time offset in g channel
+		mesh.set_instance_custom_data(i, Color(star.luminosity, star.time_offset, 0, 0))
 
 
 func _process(_delta):
